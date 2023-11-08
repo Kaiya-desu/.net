@@ -1,0 +1,44 @@
+﻿ <tr>
+     <td>
+         <img src="@Student.AvatarUrl" alt="Avatar" class="avatar" width="64" height="64">
+         </td>
+     <td>
+         @Student.FirstName
+         </td>
+     <td>
+         @Student.LastName
+         </td>
+     <td>
+         @Student.Birthdate.ToShortDateString()
+         </td>
+     <td>
+         @Student.Studies
+         </td>
+     <td>
+         <button @onclick="Click">X</button> 
+     </td>
+</tr>
+
+ @inject IJSRuntime js
+ 
+ @code{
+
+    [Parameter]
+    public Student Student { get; set; }
+
+    [Parameter]
+    public EventCallback<Student> OnDeleteClicked { get; set; }
+
+    private async Task Click()
+    {
+        var confirmed = await js.InvokeAsync<bool>("confirm", "Are you sure?");
+      //  Console.WriteLine("Confirmed " + confirmed);
+        if (confirmed)
+        {
+            await OnDeleteClicked.InvokeAsync(Student);
+        }
+    }
+
+
+}
+

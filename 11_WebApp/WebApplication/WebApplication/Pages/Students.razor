@@ -1,0 +1,107 @@
+﻿@page "/students"
+
+<h3><u>Studenci</u></h3>
+<table class="table">
+    @if (students.Count == 0)
+    {
+        <tr>
+            <td>
+                There are no students
+            </td>
+        </tr>
+    }
+    else
+    {
+    <thead>
+    <tr>
+        <th>Avatar</th>
+        <th><span @onclick=@(() => SortTable("FirstName"))><u style="color:blue">FirstName</u></span></th>
+        <th><span @onclick=@(() => SortTable("LastName"))><u style="color:blue">LastName</u></span></th>
+        <th><span @onclick=@(() => SortTable("Birthdate"))><u style="color:blue">Birthdate</u></span></th>
+        <th><span @onclick=@(() => SortTable("Studies"))><u style="color:blue">Studies</u></span></th>
+        <th></th>
+    </tr>
+    </thead>
+        <tbody>
+        @foreach (var stud in students)
+        {
+            <StudentsComponent Student="stud" OnDeleteClicked="DeleteStudent"/>
+        }
+        </tbody>
+    }
+</table>
+
+@code{
+
+    //[Parameter]
+   // public RenderFragment EmptyTemplate { get; set; }
+    
+    private List<Student> students { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        students = new List<Student>();
+        await Task.Delay(2000);
+        
+        students.Add(new Student
+        {
+            AvatarUrl = "https://png.pngtree.com/png-clipart/20190614/original/pngtree-female-student-icon-png-image_3728112.jpg",
+            FirstName = "Karolina",
+            LastName = "Struzek",
+            Birthdate = new DateTime(1998,09,01),
+            Studies = "Informatyka"
+        });
+        students.Add(new Student
+        {
+            AvatarUrl = "https://png.pngtree.com/png-clipart/20190614/original/pngtree-male-student-icon-png-image_3728104.jpg",
+            FirstName = "Piotr",
+            LastName = "Biwak",
+            Birthdate = new DateTime(2000,01,20),
+            Studies = "Informatyka"
+        });
+        students.Add(new Student
+        {
+            AvatarUrl = "https://png.pngtree.com/png-clipart/20190614/original/pngtree-male-student-icon-png-image_3728104.jpg",
+            FirstName = "Adam",
+            LastName = "Kowalski",
+            Birthdate = new DateTime(1999,12,15),
+            Studies = "Sztuka nowych mediów"
+        });
+    }
+
+    private void DeleteStudent(Student s)
+    {
+      //  Console.WriteLine("Deleted student " + s.FirstName + " " + s.LastName);
+        students.Remove(s);
+    }
+    
+    private bool IsSortedAscending;
+    private string CurrentSortColumn;
+    
+
+    private void SortTable(string columnName)
+    {
+        if(columnName != CurrentSortColumn) 
+        {
+            students = students.OrderBy(x => x.GetType().GetProperty(columnName)
+                                    .GetValue(x, null)).ToList();
+            CurrentSortColumn = columnName;
+            IsSortedAscending = true;
+
+        }
+        else 
+        {
+            if(IsSortedAscending)
+            {
+                students = students.OrderByDescending(x => x.GetType().GetProperty(columnName)
+                                                   .GetValue(x, null)).ToList();
+            }
+            else
+            {
+                students = students.OrderBy(x => x.GetType().GetProperty(columnName)
+                                         .GetValue(x, null)).ToList();
+            }
+            IsSortedAscending = !IsSortedAscending;
+        }
+    }
+}
